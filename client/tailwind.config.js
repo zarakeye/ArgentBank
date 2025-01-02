@@ -5,7 +5,18 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    backgroundPosition: {
+      'background-position': '0 -50px',
+    },
+    backgroundPosition_large: {
+      'background-position': '0% 33%',
+    },
+    extend: {
+      screens: {
+        'medium': '720px',
+        'large': '920px',
+      }
+    },
   },
   plugins: [],
 }
