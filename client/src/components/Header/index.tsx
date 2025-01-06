@@ -1,30 +1,54 @@
 import React from "react";
-import { NavLink, useParams } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import logo from "../../assets/argentBankLogo.svg";
+import routes from "../../routes";
 
-const style = {
-  mainNav: "flex justify-between items-center p-x-[5px] p-y-[20px]",
-  mainNavLogo: "flex items-center",
-  mainNavLogoImage: "max-w-full w-[200px]",
-};
+const MAIN_NAV = "flex justify-between items-center px-[20px] py-[5px]";
+const MAIN_NAV_LINK = "font-bold text-[#2c3e50]"
+const MAIN_NAV_LINK_ACTIVE = "hover:text-underlined"
+const MAIN_NAV_LOGO = "flex items-center"
+const MAIN_NAV_LOGO_IMAGE = "w-[200px]"
+
 
 const Header: React.FC = (): JSX.Element => {
+  const pathname = window.location.pathname;
+  console.log(`pathname: ${pathname}`);
+
   return (
-    <nav className={style.mainNav}>
-      <NavLink to="/" className={style.mainNavLogo}>
-        <img src={logo} alt="Argent Bank Logo" className={style.mainNavLogoImage} />
+    <header className={MAIN_NAV}>
+      <Link to="/" className={MAIN_NAV_LOGO}>
+        <img src={logo} alt="Argent Bank Logo" className={MAIN_NAV_LOGO_IMAGE} />
         <h1 className="sr-only">Argent Bank</h1>
-      </NavLink>
+      </Link>
       <div>
-        <NavLink to="/" className="main-nav-item">
-          <i className="fa fa-home"></i>
-          Home
-        <a class="main-nav-item" href="./sign-in.html">
-          <i class="fa fa-user-circle"></i>
-          Sign In
-        </a>
+        <nav>
+          {(pathname === routes.Home || pathname === routes.SignIn) && (
+          <li className="list-none">
+            <NavLink to="/sign-in" className={MAIN_NAV_LINK_ACTIVE}>
+              <i className="fa fa-user-circle"></i>
+              Sign In
+            </NavLink>
+          </li>
+          )}
+          {pathname === routes.User && (
+          <>
+          <li className="list-none">
+            <NavLink to="/user/profile"  className={MAIN_NAV_LINK_ACTIVE}>
+              <i className="fa fa-user-circle"></i>
+              Tony Jarvis
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/"  className={`${MAIN_NAV_LINK} ${MAIN_NAV_LINK_ACTIVE}`}>
+              <i className="fa fa-sign-out"></i>
+              Sign Out
+            </NavLink>
+          </li>
+          </>
+          )}
+        </nav>
       </div>
-    </nav>
+    </header>
   );
 };
 
