@@ -18,7 +18,7 @@ const ACCOUNT_AMOUNT_DESCRIPTION = "m-0"
 const TRANSACTION_BUTTON = "block w-full p-[8px] text-[1.1rem] font-bold mt-[1rem] border-[#00bc77] border-r-solid border-r-[2px] border-r-black border-b-solid border-b-[2px] border-b-black bg-[#00bc77] text-white"
 const TRANSACTION_BUTTON_MEDIUM = "medium:w-[200px]"
 
-const Profile: React.FC = (): JSX.Element => {
+const User: React.FC = (): JSX.Element => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -77,4 +77,4 @@ const Profile: React.FC = (): JSX.Element => {
   );
 };
 
-export default Profile;
+export default User;

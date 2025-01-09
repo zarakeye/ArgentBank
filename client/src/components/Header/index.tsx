@@ -31,10 +31,10 @@ const Header: React.FC = (): JSX.Element => {
               </NavLink>
             </li>
             )}
-            {pathname === routes.Profile && (
+            {pathname === routes.User && (
             <>
             <li className="list-none mr-[8px]">
-              <NavLink to="/profile"  className={MAIN_NAV_LINK_ACTIVE}>
+              <NavLink to="/user"  className={MAIN_NAV_LINK_ACTIVE}>
                 <i className="fa fa-user-circle"></i>
                 {user?.firstName}
               </NavLink>

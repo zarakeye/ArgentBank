@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from '../components/Header';
 import Home from '../pages/Home';
 import SignIn from '../pages/SignIn';
-import Profile from '../pages/Profile';
+import User from '../pages/User';
 import Footer from '../components/Footer';
 import './App.css'
 import { Provider } from 'react-redux';
@@ -19,7 +19,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/sign-in" element={<SignIn />} />
           <Route element={<ProtectedRoute />}>
-            <Route path="/profile" element={<Profile />} />
+            <Route path="/user" element={<User />} />
           </Route>
         </Routes>
         <Footer />

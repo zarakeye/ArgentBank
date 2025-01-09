@@ -13,6 +13,8 @@ const INPUT_WRAPPER = "flex flex-col text-left mb-[1rem]"
 const INPUT_REMEMBER = "flex"
 
 const SignIn: React.FC = (): JSX.Element => {
+  localStorage.removeItem('token');
+
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { loading, error, token } = useAppSelector(state => state.auth);
@@ -42,7 +44,7 @@ const SignIn: React.FC = (): JSX.Element => {
 
   useEffect(() => {
     if (token) {
-      navigate(`/profile`, { replace: true });
+      navigate(`/user`, { replace: true });
     }
   }, [token, navigate]);
 
