@@ -5,7 +5,7 @@ import iconSecurity from '../../assets/icon-security.svg';
 import bankTree from '../../assets/bank-tree.jpeg';
 
 const MAIN =  "flex flex-col justify-between flex-1";
-const HERO = `flex-1 relative backgroundPosition bg-cover bg-no-repeat h-[300px]`
+const HERO = `flex-1 relative backgroundPosition bg-cover bg-no-repeat h-[300px] bg-[url(${bankTree})]`
 const HERO__LARGE = "large:h-[400px] large:backgroundPosition__large"
 const HERO_CONTENT = "absolute top-[2rem] w-[200px] bg-white p-[2rem] mx-auto my-0 text-left"
 const HERO_CONTENT__LARGE = "large:position-absolute large:top-[50px] large:right-[50px] large:w-[300px] large:m-[2rem]"
@@ -23,6 +23,8 @@ const Home: React.FC = (): JSX.Element => {
   return (
     <main className={MAIN}>
       <div className={`${HERO} ${HERO__LARGE}`} style={{backgroundImage: `url(${bankTree})`}}>
+     
+      {/* <div className={`${HERO} ${HERO__LARGE}`}>  */}
         <section className={`${HERO_CONTENT} ${HERO_CONTENT__LARGE}`}>
           <h2 className="sr-only">Promoted Content</h2>
           <p className={`${SUBTITLE} ${SUBTITLE__LARGE}`}>No fees.</p>

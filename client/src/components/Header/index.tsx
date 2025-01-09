@@ -40,7 +40,7 @@ const Header: React.FC = (): JSX.Element => {
               </NavLink>
             </li>
             <li>
-              <NavLink to="/"  className={`${MAIN_NAV_LINK} ${MAIN_NAV_LINK_ACTIVE}`}>
+              <NavLink to="/"  className={`${MAIN_NAV_LINK} ${MAIN_NAV_LINK_ACTIVE}`} onClick={() => localStorage.removeItem('token')}>
                 <i className="fa fa-sign-out"></i>
                 Sign Out
               </NavLink>

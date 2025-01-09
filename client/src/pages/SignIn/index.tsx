@@ -34,6 +34,7 @@ const SignIn: React.FC = (): JSX.Element => {
     try {
       const loginResult = await dispatch(login(credentials)).unwrap();
       dispatch(setToken(loginResult));
+      localStorage.setItem('token', loginResult);
     } catch (error) {
       console.error("An error occurred while signing in: ", error);
     }
