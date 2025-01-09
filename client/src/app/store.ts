@@ -1,10 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 import counterReducer from './slices/counterSlice';
-import signInReducer from './slices/signInSlice';
+import authReducer from '../pages/SignIn/authSlice';
 
 export const store = configureStore({
   reducer: {
     counter: counterReducer,
-    signIn: signInReducer,
+    auth: authReducer,
   },
 });
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;

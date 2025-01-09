@@ -1,13 +1,13 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from '../components/Header';
-// import Container from './components/Container';
 import Home from '../pages/Home';
 import SignIn from '../pages/SignIn';
-import User from '../pages/User';
+import Profile from '../pages/Profile';
 import Footer from '../components/Footer';
 import './App.css'
 import { Provider } from 'react-redux';
 import { store } from './store';
+import ProtectedRoute from '../components/ProtectedRoute';
 
 function App() {
 
@@ -18,8 +18,9 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/sign-in" element={<SignIn />} />
-          <Route path="/user/profile" element={<User />} />
-          <Route path="*" element={<Error />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/profile" element={<Profile />} />
+          </Route>
         </Routes>
         <Footer />
       </Router>        
