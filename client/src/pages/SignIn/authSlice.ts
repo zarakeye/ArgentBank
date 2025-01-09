@@ -98,6 +98,42 @@ export const fetchProfile = createAsyncThunk<
   }
 );
 
+export const updateProfile = createAsyncThunk<
+  User,
+  User,
+  {
+    state: RootState;
+    rejectValue: string;
+  }
+>(
+  'auth/updateProfile',
+  async (user: User, { getState, rejectWithValue }) => {
+    try {
+      const {auth} = getState() as RootState;
+      const response = await api.put(
+        '/user/profile', user, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${auth.token}`,
+          },
+        }
+      );
+
+      const {body} = response.data;
+      return body;
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        const axiosError = error as AxiosError;
+        if (axiosError.response) {
+          const errorResponse = axiosError.response.data as ErrorResponse;
+          return rejectWithValue(errorResponse.message || 'Failed to update profile');
+        }
+      }
+      return rejectWithValue("Failed to update profile");
+    }
+  }
+)
+
 export const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -128,6 +164,22 @@ export const authSlice = createSlice({
       .addCase(fetchProfile.fulfilled, (state, action) => {
         state.user = action.payload;
       })
+      .addCase(fetchProfile.rejected, (state, action) => {
+        state.error = action.payload as string ?? 'Failed to fetch profile';
+      })
+      .addCase(updateProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateProfile.fulfilled, (state, action) => {
+        state.user = action.payload;
+      })
+      .addCase(fetchProfile.rejected, (state, action) => {
+        state.error = action.payload as string ?? 'Failed to fetch profile';
+      })
+      .addCase(updateProfile.rejected, (state, action) => {
+        state.error = action.payload as string ?? 'Failed to update profile';
+      });
   },
 });
 
