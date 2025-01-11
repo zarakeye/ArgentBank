@@ -12,9 +12,7 @@ const SIGN_IN_BUTTON = "block w-full p-[8px] text-[1.1rem] font-[bold] mt-[1rem]
 const INPUT_WRAPPER = "flex flex-col text-left mb-[1rem]"
 const INPUT_REMEMBER = "flex"
 
-const SignIn: React.FC = (): JSX.Element => {
-  localStorage.removeItem('token');
-
+const Login: React.FC = (): JSX.Element => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { loading, error, token } = useAppSelector(state => state.auth);
@@ -36,15 +34,14 @@ const SignIn: React.FC = (): JSX.Element => {
     try {
       const loginResult = await dispatch(login(credentials)).unwrap();
       dispatch(setToken(loginResult));
-      localStorage.setItem('token', loginResult);
     } catch (error) {
-      console.error("An error occurred while signing in: ", error);
+      console.error("An error occurred while logging in: ", error);
     }
   };
 
   useEffect(() => {
-    if (token) {
-      navigate(`/user`, { replace: true });
+    if (token !== null) {
+      navigate(`/profile`/*, { replace: true }*/);
     }
   }, [token, navigate]);
 
@@ -86,4 +83,4 @@ const SignIn: React.FC = (): JSX.Element => {
   );
 };
 
-export default SignIn;
+export default Login;

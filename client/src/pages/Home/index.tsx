@@ -20,8 +20,6 @@ const FEATURE_ICON = "w-[100px] border-solid border-[10px] border-[#00bc77] roun
 const FEATURE_ITEM_TITLE = "text-[#222] text-[1.25rem] font-bold mb-[.5rem]"
 
 const Home: React.FC = (): JSX.Element => {
-  localStorage.removeItem('token');
-  
   return (
     <main className={MAIN}>
       <div className={`${HERO} ${HERO__LARGE}`}> 

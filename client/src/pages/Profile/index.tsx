@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
-import { fetchProfile } from '../SignIn/authSlice';
-// import { User } from '../../services/api.types';
+import { fetchProfile } from '../Login/authSlice';
+import EditProfile from '../../components/EditProfile';
 
 const MAIN =  "flex flex-col flex-1 pb-[2rem]";
 const BG_DARK = "bg-[#12002b]"
@@ -18,7 +18,8 @@ const ACCOUNT_AMOUNT_DESCRIPTION = "m-0"
 const TRANSACTION_BUTTON = "block w-full p-[8px] text-[1.1rem] font-bold mt-[1rem] border-[#00bc77] border-r-solid border-r-[2px] border-r-black border-b-solid border-b-[2px] border-b-black bg-[#00bc77] text-white"
 const TRANSACTION_BUTTON_MEDIUM = "medium:w-[200px]"
 
-const User: React.FC = (): JSX.Element => {
+const Profile: React.FC = (): JSX.Element => {
+  const [editMode, setEditMode] = useState(false);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -29,18 +30,41 @@ const User: React.FC = (): JSX.Element => {
         console.error("Error fetching profile:", error);
       }
     };
-
-    fetchProfileData();
+    if (!localStorage.getItem('user')) {
+      fetchProfileData();
+    }
   }, [dispatch]);
 
   const { user } = useAppSelector(state => state.auth);
+  console.log('typeof user', typeof user);
 
+  const userFromStorage = localStorage.getItem('user');
+  console.log('userFromStorage', userFromStorage);
+  // let userObject = {};
+  // if (userFromStorage) {
+  //   userObject = JSON.parse(userFromStorage);
+  // }
+  const userObject = userFromStorage ? JSON.parse(userFromStorage) : null;
+  console.log('userObject', userObject);
 
   return (
     <main className={`${MAIN} ${BG_DARK}`}>
       <div className={HEADER}>
-        <h1 className={TITLE}>Welcome back<br />{`${user?.firstName } ${user?.lastName}` } !</h1>
-        <button className={EDIT_BUTTON}>Edit Name</button>
+        <h1 className='sr-only'>Ma page</h1>
+        {
+          editMode ? (
+            <>
+              <p className={TITLE}>Welcome back</p>
+              <EditProfile setEditMode={setEditMode} />
+            </>
+          ) : (
+            <>
+              {/* <p className={TITLE}>Welcome back<br />{`${user?.firstName } ${user?.lastName}` } !</p> */}
+              <p className={TITLE}>Welcome back<br />{`${userObject?.firstName} ${userObject?.lastName}` } !</p>
+              <button className={EDIT_BUTTON} onClick={() => setEditMode(true)}>Edit Name</button>
+            </>
+          )
+        }
       </div>
       <h2 className="sr-only">Accounts</h2>
       <section className={`${ACCOUNT} ${ACCOUNT_MEDIUM}`}>
@@ -77,4 +101,4 @@ const User: React.FC = (): JSX.Element => {
   );
 };
 
-export default User;
+export default Profile;

@@ -7,7 +7,7 @@ const ProtectedRoute: React.FC = () => {
 
   if (!token) {
     console.log('token', token);
-    return <Navigate to="/sign-in" state={{ from: pathname }} replace />;
+    return <Navigate to="/login" state={{ from: pathname }} replace />;
   }
 
   return <Outlet/>;
