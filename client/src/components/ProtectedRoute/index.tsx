@@ -5,7 +5,7 @@ const ProtectedRoute: React.FC = () => {
   const {pathname} = useLocation();
   console.log('pathname', pathname);
 
-  if (!token) {
+  if (token === null) {
     console.log('token', token);
     return <Navigate to="/login" state={{ from: pathname }} replace />;
   }

@@ -23,3 +23,7 @@ export interface AuthState {
   loading: boolean;
 }
 
+export interface ApiError {
+  message: string;
+  status?: number;
+}

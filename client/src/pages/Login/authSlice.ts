@@ -1,55 +1,36 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { RootState } from '../../app/store';
-import type { AuthState, Credentials, User } from '../../services/api.types';
-// import axios, { AxiosError } from 'axios';
+import type { AuthState, Credentials, User, ApiError } from '../../services/api.types';
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api/v1';
 
-// interface ErrorResponse {
-//   message: string;
-// }
+const getInitialState = (): AuthState => {
+  const token = localStorage.getItem('token');
+  const userStr = localStorage.getItem('user');
+  const user = userStr ? JSON.parse(userStr) : null;
 
-const initialState: AuthState = {
-  token: null,
-  user: null,
-  error: null,
-  loading: false,
+  return {
+    token,
+    user,
+    error: null,
+    loading: false,
+  };
 };
 
-// const api = axios.create({
-//   baseURL: BASE_URL,
-// });
-
-// api.interceptors.request.use((config) => {
-//   const token = localStorage.getItem('token');
-//   if (token) {
-//     config.headers.Authorization = `Bearer ${token}`;
-//   }
-//   return config;
-// });
+const initialState: AuthState = getInitialState();
 
 export const login = createAsyncThunk<
   string,
   Credentials,
   {
     state: RootState;
-    rejectValue: string;
+    rejectValue: ApiError;
   }
 >
 (
   'auth/login',
   async (credentials: Credentials, { rejectWithValue }) => {
     try {
-      // const response = await api.post(
-      //   '/user/login',
-      //   credentials
-      // );
-
-      // const {token} = response.data.body;
-      // console.log("token", token);
-      // localStorage.setItem('token', token);
-      // return token;
-
       const response = await fetch(
         `${BASE_URL}/user/login`, {
           method: 'POST',
@@ -60,21 +41,21 @@ export const login = createAsyncThunk<
         }
       );
 
-      const {body} = await response.json();
-      return body.token;
-    } catch (error: unknown) {
-      // if (error instanceof AxiosError) {
-      //   const axiosError = error as AxiosError;
-      //   if (axiosError.response) {
-      //     const errorResponse = axiosError.response.data as ErrorResponse;
-      //     return rejectWithValue(errorResponse.message || 'An error occurred while logging in');
-      //   }
-      // }
-      // return rejectWithValue("An error occurred while logging in");
-      if (error instanceof Error) {
-        return rejectWithValue(error.message);
+      if (!response.ok) {
+        const errorData: ApiError = await response.json();
+        return rejectWithValue({
+          message: errorData.message || 'Login failed',
+          status: response.status,
+        });
       }
-      return rejectWithValue("An error occurred while logging in");
+
+      const {body} = await response.json();
+      localStorage.setItem('token', body.token)
+      return body.token;
+    } catch (error) {
+      return rejectWithValue({
+        message: error instanceof Error ? error.message : 'An unknown error occured'
+      });
     }
   }
 );
@@ -84,23 +65,21 @@ export const fetchProfile = createAsyncThunk<
   void,
     {
       state: RootState;
-      rejectValue: string;
+      rejectValue: ApiError;
     }
 >(
   'auth/fetchProfile',
   async (_, { getState, rejectWithValue }) => {
     try {
-      // const {auth} = getState() as RootState;
-      // const response = await api.get(
-      //   '/user/profile', {
-      //     headers: {
-      //       'Content-Type': 'application/json',
-      //       'Authorization': `Bearer ${auth.token}`,
-      //     },
-      //   }
-      // );
-
       const {auth} = getState() as RootState;
+      const token = auth.token || localStorage.getItem('token');
+
+      if (!token) {
+        return rejectWithValue({
+          message: 'No authentication token found',
+          status: 401
+        });
+      }
       const response = await fetch(
         `${BASE_URL}/user/profile`, {
           method: 'GET',
@@ -111,21 +90,22 @@ export const fetchProfile = createAsyncThunk<
         }
       );
 
+      if (!response.ok) {
+        const errorData = await response.json();
+        
+        return rejectWithValue({
+          message: errorData.message || 'Failed to fetch profile',
+          status: response.status
+        });
+      }
+
       const {body} = await response.json();
       localStorage.setItem('user', JSON.stringify(body));
       return body;
-    } catch (error: unknown) {
-      // if (error instanceof AxiosError) {
-      //   const axiosError = error as AxiosError;
-      //   if (axiosError.response) {
-      //     const errorResponse = axiosError.response.data as ErrorResponse;
-      //     return rejectWithValue(errorResponse.message || 'Failed to fetch profile');
-      //   }
-      // }
-      if (error instanceof Error) {
-        return rejectWithValue(error.message);
-      }
-      return rejectWithValue("Failed to fetch profile");
+    } catch (error) {
+      return rejectWithValue({
+        message: error instanceof Error ? error.message : 'Failed to fetch profile'
+      });
     }
   }
 );
@@ -135,22 +115,13 @@ export const updateProfile = createAsyncThunk<
   User,
   {
     state: RootState;
-    rejectValue: string;
+    rejectValue: ApiError;
   }
 >(
   'auth/updateProfile',
   async (user: User, { getState, rejectWithValue }) => {
     try {
       const {auth} = getState() as RootState;
-      // const response = await api.put(
-      //   '/user/profile', user, {
-      //     headers: {
-      //       'Content-Type': 'application/json',
-      //       'Authorization': `Bearer ${auth.token}`,
-      //     },
-      //   }
-      // );
-
       const response = await fetch(
         `${BASE_URL}/user/profile`, {
           method: 'PUT',
@@ -161,24 +132,24 @@ export const updateProfile = createAsyncThunk<
           body: JSON.stringify(user),
         }
       )
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue({
+          message: errorData.message || 'Failed to update profile',
+          status: response.status
+        });
+      }
+
       const {body} = await response.json();
       return body;
     } catch (error: unknown) {
-      // if (error instanceof AxiosError) {
-      //   const axiosError = error as AxiosError;
-      //   if (axiosError.response) {
-      //     const errorResponse = axiosError.response.data as ErrorResponse;
-      //     return rejectWithValue(errorResponse.message || 'Failed to update profile');
-      //   }
-      // }
-
-      if (error instanceof Error) {
-        return rejectWithValue(error.message);
-      }
-      return rejectWithValue("Failed to update profile");
+      return rejectWithValue({
+        message: error instanceof Error ? error.message : 'Failed to update profile',
+      });
     }
   }
-)
+);
 
 export const authSlice = createSlice({
   name: 'auth',
@@ -188,11 +159,23 @@ export const authSlice = createSlice({
       state.token = action.payload;
       localStorage.setItem('token', action.payload);
     },
+    initAuth: (state, action) => {
+      return {
+        ...state,
+        ...action.payload,
+        error: null,
+      };
+    },
     logout: (state) => {
-      state.token = null;
-      state.user = null;
       localStorage.removeItem('token');
       localStorage.removeItem('user');
+      return {
+        ...state,
+        token: null,
+        user: null,
+        error: null,
+        loading: false,
+      }
     },
   },
   extraReducers: (builder) => {
@@ -207,7 +190,7 @@ export const authSlice = createSlice({
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string ?? 'An error occurred while logging in';
+        state.error = action.payload?.message ?? 'An error occurred while logging in';
       })
       .addCase(fetchProfile.fulfilled, (state, action) => {
         state.loading = false;
@@ -215,7 +198,14 @@ export const authSlice = createSlice({
       })
       .addCase(fetchProfile.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string ?? 'Failed to fetch profile';
+        state.error = action.payload?.message ?? 'Failed to fetch profile';
+
+        if (action.payload?.status === 401) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          state.token = null;
+          state.user = null;
+        }
       })
       .addCase(fetchProfile.pending, (state) => {
         state.loading = true;
@@ -227,7 +217,7 @@ export const authSlice = createSlice({
       })
       .addCase(updateProfile.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string ?? 'Failed to fetch profile';
+        state.error = action.payload?.message ?? 'Failed to fetch profile';
       })
       .addCase(updateProfile.pending, (state) => {
         state.loading = true;
@@ -236,6 +226,6 @@ export const authSlice = createSlice({
   },
 });
 
-export const { setToken, logout } = authSlice.actions;
+export const { setToken, initAuth, logout } = authSlice.actions;
 export default authSlice.reducer;
 

@@ -2,19 +2,14 @@ import React from 'react';
 import iconChat from '../../assets/icon-chat.svg';
 import iconMoney from '../../assets/icon-money.svg';
 import iconSecurity from '../../assets/icon-security.svg';
-// import bankTree from '../../assets/bank-tree.jpeg';
+import bankTree from '../../assets/bank-tree.jpeg';
 
 const MAIN =  "flex flex-col justify-between flex-1";
-const HERO = `flex-1 relative backgroundPosition bg-cover bg-no-repeat h-[300px] bg-[url('bank-tree.jpeg')]`
-const HERO__LARGE = "large:h-[400px] large:backgroundPosition__large"
-const HERO_CONTENT = "absolute top-[2rem] w-[200px] bg-white p-[2rem] mx-auto my-0 text-left"
-const HERO_CONTENT__LARGE = "large:position-absolute large:top-[50px] large:right-[50px] large:w-[300px] large:m-[2rem]"
-const SUBTITLE = "font-bold text-[1rem] m-0"
-const SUBTITLE__LARGE = "large:text-[1.5rem]"
-const TEXT = "text-[.9rem]"
-const TEXT__LARGE = "large:text-[1.2rem]"
-const FEATURES = "flex flex-col justify-center items-center"
-const FEATURES__LARGE = "large:flex-row"
+const HERO = "relative backgroundPosition bg-cover bg-no-repeat w-full h-[300px] large:h-[550px]";
+const HERO_CONTENT = "absolute left-[50%] large:left-auto translate-x-[-50%] large:translate-x-0 top-[2rem] large:top-[50px] large:right-[50px] bg-white p-[2rem] mx-auto my-0 text-left leading-[18px] w-[264px] large:w-[364px] large:m-[2rem]"
+const SUBTITLE = "font-bold text-[1rem] large:text-[1.5rem] m-0 large:h-[28px]"
+const TEXT = "text-[.9rem] large:text-[1.2rem] mt-[.9rem] large:mt-[1.2rem] large:leading-[22px]"
+const FEATURES = "flex flex-col justify-center items-center large:flex-row"
 const FEATURE_ITEM = "flex-1 p-[2.5rem] flex flex-col items-center"
 const FEATURE_ICON = "w-[100px] border-solid border-[10px] border-[#00bc77] rounded-full"
 const FEATURE_ITEM_TITLE = "text-[#222] text-[1.25rem] font-bold mb-[.5rem]"
@@ -22,16 +17,17 @@ const FEATURE_ITEM_TITLE = "text-[#222] text-[1.25rem] font-bold mb-[.5rem]"
 const Home: React.FC = (): JSX.Element => {
   return (
     <main className={MAIN}>
-      <div className={`${HERO} ${HERO__LARGE}`}> 
-        <section className={`${HERO_CONTENT} ${HERO_CONTENT__LARGE}`}>
+      <div className={HERO}>
+        <img src={bankTree} alt="Bank Tree" className='w-full h-[300px] object-cover object-center large:h-[550px]' />
+        <section className={HERO_CONTENT}>
           <h2 className="sr-only">Promoted Content</h2>
-          <p className={`${SUBTITLE} ${SUBTITLE__LARGE}`}>No fees.</p>
-          <p className={`${SUBTITLE} ${SUBTITLE__LARGE}`}>No minimum deposit.</p>
-          <p className={`${SUBTITLE} ${SUBTITLE__LARGE}`}>High interest rates.</p>
-          <p className={`${TEXT} ${TEXT__LARGE}`}>Open a savings account with Argent Bank today!</p>
+          <p className={SUBTITLE}>No fees.</p>
+          <p className={SUBTITLE}>No minimum deposit.</p>
+          <p className={SUBTITLE}>High interest rates.</p>
+          <p className={TEXT}>Open a savings account with Argent Bank today!</p>
         </section>
       </div>
-      <section className={`${FEATURES} ${FEATURES__LARGE}`}>
+      <section className={FEATURES}>
         <h2 className="sr-only">Features</h2>
         <div className={FEATURE_ITEM}>
           <img src={iconChat} alt="Chat Icon" className={FEATURE_ICON} />

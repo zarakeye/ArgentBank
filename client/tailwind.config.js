@@ -28,7 +28,13 @@ export default {
       screens: {
         'medium': '720px',
         'large': '920px',
-      }
+      },
+      borderStyle: {
+        'r-inset': 'inset',
+        'l-inset': 'inset',
+        'b-inset': 'inset',
+        't-inset': 'inset',
+      },
     },
   },
   plugins: [],
