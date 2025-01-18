@@ -18,6 +18,15 @@ const ACCOUNT_AMOUNT_DESCRIPTION = "m-0"
 const TRANSACTION_BUTTON = "block w-full medium:w-[200px] p-[8px] text-[1.1rem] font-bold mt-[1rem] "
 const CTA = "border-l border-l-[2px] border-l-[#00bc77] border-t border-t-[2px] border-t-[#00bc77] border-r border-r-[2px] border-r-[#1f6040] border-b border-b-[2px] border-b-[#1f6040] border-r-inset border-b-inset bg-[#00bc77] text-white"
 
+/**
+ * Profile page component.
+ *
+ * Displays the user's profile information, available balance in
+ * different accounts, and provides links to view transactions.
+ * If the user is not authenticated, it redirects to the home page.
+ *
+ * @returns {JSX.Element} The Profile page component.
+ */
 const Profile: React.FC = (): JSX.Element => {
   const [editMode, setEditMode] = useState(false);
   const dispatch = useAppDispatch();
@@ -26,9 +35,19 @@ const Profile: React.FC = (): JSX.Element => {
   const userFromStorage = localStorage.getItem('user');
 
   useEffect(() => {
+    /**
+     * Fetches the user profile data from the server, if the user is
+     * authenticated. If not, it redirects to the home page.
+     *
+     * The function is called on mount and whenever the user's storage
+     * token changes.
+     *
+     * @returns {Promise<void>} A promise that resolves when the profile
+     * data is fetched or the user is redirected.
+     */
     const fetchProfileData = async () => {
       try {
-        if (tokenFromStorage !== null) {
+        if (tokenFromStorage) {
           await dispatch(fetchProfile()).unwrap();
         } else {
           navigate(routes.Home, { replace: true });

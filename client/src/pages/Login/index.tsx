@@ -13,6 +13,18 @@ const SIGN_IN_BUTTON = "block w-full p-[8px] text-[1.1rem] font-[bold] mt-[1rem]
 const INPUT_WRAPPER = "flex flex-col text-left mb-[1rem]"
 const INPUT_REMEMBER = "flex"
 
+/**
+ * The Login component renders a login form for user authentication.
+ *
+ * It provides fields for email, password, and a "Remember me" option.
+ * Upon submission, it dispatches a login action and sets the authentication token
+ * if successful. If a token is present, it navigates to the profile page.
+ *
+ * The component displays any error messages from the authentication process
+ * and disables the submit button while loading.
+ *
+ * @returns {JSX.Element} The login form component.
+ */
 const Login: React.FC = (): JSX.Element => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -29,6 +41,20 @@ const Login: React.FC = (): JSX.Element => {
     password: formData.password,
   };
 
+  /**
+   * Handles the form submission for the login form.
+   *
+   * Prevents the default form submission behavior and attempts to log in
+   * the user with the provided credentials. Dispatches the login action
+   * and sets the authentication token upon successful login.
+   *
+   * If an error occurs during the login process, it logs the error to
+   * the console.
+   *
+   * @param {FormEvent<HTMLFormElement>} e - The form submission event.
+   * @returns {Promise<void>} A promise that resolves when the login
+   * process is complete.
+   */
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -42,7 +68,7 @@ const Login: React.FC = (): JSX.Element => {
 
   useEffect(() => {
     if (token !== null) {
-      navigate(routes.Profile, { replace: true });
+      navigate(routes.Profile/*, { replace: true }*/);
     }
   }, [token, navigate]);
 

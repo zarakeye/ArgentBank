@@ -11,6 +11,20 @@ import { useAppDispatch } from './hooks';
 import { initAuth, fetchProfile } from '../pages/Login/authSlice';
 import routes from '../routes';
 
+/**
+ * The main application component that sets up routing and initializes
+ * authentication state from localStorage. It uses React Router for navigation
+ * and manages user authentication by dispatching actions to the Redux store.
+ * 
+ * - Retrieves the token from localStorage and, if present, checks for user data.
+ * - Dispatches `fetchProfile` if user data is not found in localStorage.
+ * - Initializes authentication state using `initAuth` if user data is available.
+ * - Sets up routes for Home, Login, and Profile pages using ProtectedRoute for
+ *   the Profile route, which requires authentication.
+ * 
+ * @returns {JSX.Element} The application's main structure including Header, 
+ * Routes, and Footer components.
+ */
 const App: React.FC = (): JSX.Element => {
   const dispatch = useAppDispatch();
   const token = localStorage.getItem('token');

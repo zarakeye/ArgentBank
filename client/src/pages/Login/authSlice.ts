@@ -4,6 +4,15 @@ import type { AuthState, Credentials, User, ApiError } from '../../services/api.
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api/v1';
 
+/**
+ * Returns the initial state of the authentication slice from localStorage.
+ *
+ * The initial state includes the authentication token, the user object, and
+ * error and loading flags. The user object is parsed from a JSON string stored
+ * in localStorage. If the user object is not present, it is set to null.
+ *
+ * @returns {AuthState} the initial state of the authentication slice
+ */
 const getInitialState = (): AuthState => {
   const token = localStorage.getItem('token');
   const userStr = localStorage.getItem('user');
@@ -155,17 +164,53 @@ export const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
+    /**
+     * Updates the authentication token in the state and localStorage.
+     *
+     * This reducer function sets the token value in the Redux state to the 
+     * payload of the action. It also persists the token to localStorage 
+     * for maintaining authentication state across sessions.
+     *
+     * @param {AuthState} state - The current state of the authentication slice.
+     * @param {PayloadAction<string>} action - The action object containing 
+     * a payload with the new token.
+     */
     setToken: (state, action) => {
       state.token = action.payload;
       localStorage.setItem('token', action.payload);
     },
-    initAuth: (state, action) => {
+
+    
+      /**
+       * Initializes the authentication state with provided payload data.
+       *
+       * This reducer function merges the current authentication state with the 
+       * payload data from the dispatched action. It resets any existing error 
+       * state to null, ensuring a clean state update. Typically used to set 
+       * the initial authentication state upon successful login or session restore.
+       *
+       * @param {AuthState} state - The current state of the authentication slice.
+       * @param {PayloadAction<AuthState>} action - The action object containing 
+       * a payload with the new authentication state data.
+       */
+      initAuth: (state, action) => {
       return {
         ...state,
         ...action.payload,
         error: null,
       };
     },
+
+    /**
+     * Resets the authentication state and clears localStorage.
+     *
+     * This reducer function returns a new state object that resets all values
+     * to their initial state. It also removes the token and user from
+     * localStorage, effectively logging the user out.
+     *
+     * @param {AuthState} state - The current state of the authentication slice.
+     * @returns {AuthState} The new state with all values reset to initial state.
+     */
     logout: (state) => {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
@@ -178,6 +223,35 @@ export const authSlice = createSlice({
       }
     },
   },
+  
+  /**
+   * Defines extra reducers for the authentication slice, which are used to 
+   * handle the side effects of asynchronous actions. These reducers are 
+   * called when the corresponding action is dispatched, and they update the 
+   * state of the authentication slice accordingly.
+   * 
+   * The extra reducers defined here handle the following actions:
+   * - `login.pending`: Sets `loading` to `true` and `error` to `null`.
+   * - `login.fulfilled`: Sets `loading` to `false` and `token` to the 
+   *   payload of the action.
+   * - `login.rejected`: Sets `loading` to `false` and `error` to the 
+   *   error message from the action payload, or a default error message if 
+   *   none is provided.
+   * - `fetchProfile.fulfilled`: Sets `loading` to `false` and `user` to the 
+   *   payload of the action.
+   * - `fetchProfile.rejected`: Sets `loading` to `false` and `error` to the 
+   *   error message from the action payload, or a default error message if 
+   *   none is provided. If the error status is 401, it also logs the user out 
+   *   by removing the token and user from localStorage and setting them to 
+   *   `null` in the state.
+   * - `fetchProfile.pending`: Sets `loading` to `true` and `error` to `null`.
+   * - `updateProfile.fulfilled`: Sets `loading` to `false` and `user` to the 
+   *   payload of the action.
+   * - `updateProfile.rejected`: Sets `loading` to `false` and `error` to the 
+   *   error message from the action payload, or a default error message if 
+   *   none is provided.
+   * - `updateProfile.pending`: Sets `loading` to `true` and `error` to `null`.
+   */
   extraReducers: (builder) => {
     builder
       .addCase(login.pending, (state) => {

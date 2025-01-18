@@ -7,6 +7,18 @@ interface EditProfileProps {
   setEditMode: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+/**
+ * Component for editing a user profile.
+ *
+ * It displays a form to update the user's first name and last name.
+ * The component is given a callback `setEditMode` to be called when the
+ * form is successfully submitted or when the user clicks the cancel button.
+ *
+ * @param {React.Dispatch<React.SetStateAction<boolean>>} setEditMode
+ *   a callback to be called when the form is submitted or cancelled
+ * @returns {JSX.Element}
+ *   a form component with fields to update the user's first name and last name
+ */
 const EditProfile: React.FC<EditProfileProps> = ({setEditMode}): JSX.Element => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector(state => state.auth);
@@ -15,6 +27,17 @@ const EditProfile: React.FC<EditProfileProps> = ({setEditMode}): JSX.Element => 
     setEditMode(false);
   }
 
+  /*************  ✨ Codeium Command ⭐  *************/
+    /**
+     * Handles the form submission and updates the user's profile.
+     *
+     * If the fields are empty, the values are taken from the placeholder of the
+     * input fields.
+     *
+     * @param {React.FormEvent<HTMLFormElement>} event the form submission event
+     * @returns {Promise<void>} an unresolved promise
+     */
+  /******  c28a2f28-5923-4d22-b816-9e1b8840ac9b  *******/ 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 

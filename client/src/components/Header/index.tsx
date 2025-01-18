@@ -1,8 +1,8 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import logo from "../../assets/argentBankLogo.svg";
 import routes from "../../routes";
-import { useAppSelector, useAppDispatch } from "../../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { logout } from "../../pages/Login/authSlice";
 
 const MAIN_NAV = "flex justify-between items-center px-[20px] py-[5px]";
@@ -11,28 +11,32 @@ const MAIN_NAV_LINK_ACTIVE = "hover:text-underlined"
 const MAIN_NAV_LOGO = "flex items-center"
 const MAIN_NAV_LOGO_IMAGE = "w-[200px]"
 
+/**
+ * The Header component renders the main navigation bar of the Argent Bank website.
+ * 
+ * It displays a logo on the left and navigation links on the right. The navigation
+ * links change depending on the current route. If the user is on the home or login
+ * page, it displays a "Sign In" link. If the user is on the profile page, it displays
+ * the user's first name and a "Sign Out" link. Clicking on the "Sign Out" link will
+ * log the user out and redirect them to the home page.
+ */
 const Header: React.FC = (): JSX.Element => {
   const {pathname} = useLocation();
-  const { token, user } = useAppSelector(state => state.auth);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const userFromStorage = localStorage.getItem('user');
-  const tokenFromStorage = localStorage.getItem('token');
-  const userObject = userFromStorage ? JSON.parse(userFromStorage) : null;
+  const userFromState = useAppSelector((state) => state.auth.user);
 
+  const user = userFromStorage ? JSON.parse(userFromStorage) : userFromState;
+
+  /**
+   * Logs the user out by dispatching the logout action and redirects them to
+   * the home page.
+   */
   const handleClick = () => {
     dispatch(logout());
-    console.log('logout: localStorage(user)', localStorage.getItem('user'), 'localStorage(token)', localStorage.getItem('token'), 'token', token, 'user', user);
-    // setTimeout(() => {
-    //   navigate(routes.Home, { replace: true });
-    // }, 10);
+    navigate(routes.Home, { replace: true });
   }
-
-  useEffect(() => {
-    if (pathname === routes.Profile && tokenFromStorage === null) {
-      navigate(routes.Home/*, { replace: true }*/);
-    }
-  }, [tokenFromStorage, pathname, navigate]);
 
   return (
     <header className={MAIN_NAV}>
@@ -63,7 +67,7 @@ const Header: React.FC = (): JSX.Element => {
             <li className="list-none mr-[8px]">
               <NavLink to="/profile"  className={`${MAIN_NAV_LINK_ACTIVE}`}>
                 <i className="fa fa-user-circle inline-block mr-[5px]"></i>
-                {userObject?.firstName}
+                {user?.firstName}
               </NavLink>
             </li>
             <li>
