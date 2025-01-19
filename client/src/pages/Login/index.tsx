@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "../../app/hooks";
 import { setToken, login } from "./authSlice";
 import type { Credentials } from "../../services/api.types";
-import routes from "../../routes";
 
 const MAIN = "flex flex-col flex-1 justify-start"
 const BG_DARK = "bg-[#12002b]"
@@ -29,17 +28,28 @@ const Login: React.FC = (): JSX.Element => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { loading, error, token } = useAppSelector(state => state.auth);
+  const localStorageUsername = localStorage.getItem('username');
 
   const  [formData, setFormData] = useState({
-    email: "",
+    username: "",
     password: "",
     rememberMe: false,
   });
 
   const credentials: Credentials = {
-    email: formData.email,
+    email: formData.username,
     password: formData.password,
   };
+
+  useEffect(() => {
+    if (localStorageUsername) {
+      setFormData({
+        ...formData,
+        username: localStorageUsername,
+        rememberMe: true
+      });
+    }
+  }, []);
 
   /**
    * Handles the form submission for the login form.
@@ -55,10 +65,15 @@ const Login: React.FC = (): JSX.Element => {
    * @returns {Promise<void>} A promise that resolves when the login
    * process is complete.
    */
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
 
     try {
+      if (formData.rememberMe) {
+        localStorage.setItem('username', formData.username);
+      } else {
+        localStorage.removeItem('username');
+      }
       const loginResult = await dispatch(login(credentials)).unwrap();
       dispatch(setToken(loginResult));
     } catch (error) {
@@ -67,8 +82,8 @@ const Login: React.FC = (): JSX.Element => {
   };
 
   useEffect(() => {
-    if (token !== null) {
-      navigate(routes.Profile/*, { replace: true }*/);
+    if (token) {
+      navigate('/profile', { replace: true });
     }
   }, [token, navigate]);
 
@@ -84,7 +99,7 @@ const Login: React.FC = (): JSX.Element => {
         <form onSubmit={handleSubmit}>
           <div className={INPUT_WRAPPER}>
             <label htmlFor="username" className="text-[16px] font-bold">Username</label>
-            <input type="text" id="username" name="username" className="border-solid border-[1px] border-black pl-[5px]" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
+            <input type="email" id="username" name="username" className="border-solid border-[1px] border-black pl-[5px]" value={ formData.username } onChange={(e) => setFormData({ ...formData, username: e.target.value })} />
           </div>
 
           <div className={INPUT_WRAPPER}>

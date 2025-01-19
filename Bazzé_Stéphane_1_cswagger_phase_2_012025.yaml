@@ -1,0 +1,366 @@
+swagger: '2.0'
+info:
+  title: Bank Argent API documentation
+  description: Contains all available API endpoints in this codebase
+  version: '1.0.0'
+  termsOfService: 'https://swagger.io/terms/'
+host: localhost:3001
+basePath: /api/v1
+schemes:
+  - http
+tags:
+  - name: User Module
+    description: User authentication and profile management
+  - name: Account Module
+    description: Account and transaction management
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /user/login:
+    post:
+      tags:
+        - User Module
+      summary: Login
+      description: API for Login
+      parameters:
+        - in: body
+          name: body
+          description: Login Payload
+          required: true
+          schema:
+            $ref: '#/definitions/Login'
+      responses:
+        '200':
+          description: Login Successfully
+          schema:
+            $ref: '#/definitions/LoginResponse'
+        '400':
+          description: Invalid Fields
+        '500':
+          description: Internal Server Error
+  /user/signup:
+    post:
+      tags:
+        - User Module
+      summary: Signup
+      description: API for Signup
+      parameters:
+        - in: body
+          name: body
+          description: Signup Payload
+          required: true
+          schema:
+            $ref: '#/definitions/User'
+      responses:
+        '200':
+          description: Signup Successfully
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        '400':
+          description: Invalid Fields
+        '500':
+          description: Internal Server Error
+  /user/profile:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - User Module
+      summary: User Profile API
+      description: API for fetching a user profile
+      responses:
+        '200':
+          description: User profile retrieved successfully
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        '400':
+          description: Invalid Fields
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+    put:
+      security:
+        - Bearer: []
+      tags:
+        - User Module
+      summary: User Profile API
+      description: API for updating a user profile
+      parameters:
+        - in: body
+          name: body
+          description: Update user profile attributes
+          required: true
+          schema:
+            $ref: '#/definitions/UserProfile'
+      responses:
+        '200':
+          description: User profile updated successfully
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        '400':
+          description: Invalid Fields
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+  /user/accounts:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - Account Module
+      summary: Get User Accounts
+      description: API for retrieving all accounts of a user
+      responses:
+        '200':
+          description: Accounts retrieved successfully
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Account'
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+  /user/accounts/{accountId}/transactions:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - Account Module
+      summary: Get Account Transactions
+      description: API for retrieving all transactions of an account
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          type: string
+          description: ID of the account
+      responses:
+        '200':
+          description: Transactions retrieved successfully
+          schema:
+            $ref: '#/definitions/TransactionsResponse'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Account not found
+        '500':
+          description: Internal Server Error
+  /user/accounts/{accountId}/transactions/{transactionId}:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - Account Module
+      summary: Get Transaction Details
+      description: API for retrieving details of a specific transaction
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          type: string
+          description: ID of the account
+        - name: transactionId
+          in: path
+          required: true
+          type: string
+          description: ID of the transaction
+      responses:
+        '200':
+          description: Transaction retrieved successfully
+          schema:
+            $ref: '#/definitions/Transaction'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Account or transaction not found
+        '500':
+          description: Internal Server Error
+    put:
+      security:
+        - Bearer: []
+      tags:
+        - Account Module
+      summary: Update Transaction
+      description: API for updating a transaction (category and note only)
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          type: string
+          description: ID of the account
+        - name: transactionId
+          in: path
+          required: true
+          type: string
+          description: ID of the transaction
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              category:
+                type: string
+                description: Updated category of the transaction
+              note:
+                type: string
+                description: Updated note for the transaction
+      responses:
+        '200':
+          description: Transaction updated successfully
+          schema:
+            $ref: '#/definitions/Transaction'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Account or transaction not found
+        '500':
+          description: Internal Server Error
+securityDefinitions:
+  Bearer:
+    type: apiKey
+    name: Authorization
+    in: header
+    description: 'JWT Authorization header using the Bearer scheme. Example: "Bearer {token}"'
+definitions:
+  User:
+    type: object
+    required:
+      - email
+      - password
+      - firstName
+      - lastName
+    properties:
+      email:
+        type: string
+        format: email
+        description: user email
+      password:
+        type: string
+        format: password
+        description: user password
+        minLength: 8
+      firstName:
+        type: string
+        description: user first name
+      lastName:
+        type: string
+        description: user last name
+  Login:
+    type: object
+    required:
+      - email
+      - password
+    properties:
+      email:
+        type: string
+        format: email
+        description: user email
+      password:
+        type: string
+        format: password
+        description: user password
+  ApiResponse:
+    type: object
+    properties:
+      status:
+        type: integer
+        example: 200
+      message:
+        type: string
+        example: "Operation successful"
+      body:
+        type: object
+        properties:
+          id:
+            type: string
+            format: uuid
+          email:
+            type: string
+            format: email
+  LoginResponse:
+    type: object
+    properties:
+      token:
+        type: string
+        format: jwt
+        description: JWT authentication token
+  UserProfile:
+    type: object
+    properties:
+      firstName:
+        type: string
+        description: user first name
+      lastName:
+        type: string
+        description: user last name
+  Account:
+    type: object
+    required:
+      - accountId
+      - label
+      - balance
+    properties:
+      accountId:
+        type: string
+        format: uuid
+        description: Unique identifier of the account
+      label:
+        type: string
+        description: Account name or label
+      balance:
+        type: number
+        format: double
+        description: Current balance of the account
+  Transaction:
+    type: object
+    required:
+      - transactionId
+      - amount
+      - timestamp
+      - description
+      - type
+    properties:
+      transactionId:
+        type: string
+        format: uuid
+        description: Unique identifier of the transaction
+      amount:
+        type: number
+        format: double
+        description: Transaction amount
+      timestamp:
+        type: string
+        format: date-time
+        description: Date and time of the transaction
+      description:
+        type: string
+        description: Transaction description
+      type:
+        type: string
+        enum: [DEBIT, CREDIT]
+        description: Type of transaction
+      category:
+        type: string
+        description: Category of the transaction
+      note:
+        type: string
+        description: Optional note for the transaction
+  TransactionsResponse:
+    type: object
+    properties:
+      status:
+        type: integer
+        example: 200
+      message:
+        type: string
+        example: "Transactions retrieved successfully"
+      body:
+        type: array
+        items:
+          $ref: '#/definitions/Transaction'

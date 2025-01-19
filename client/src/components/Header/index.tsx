@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import logo from "../../assets/argentBankLogo.svg";
 import routes from "../../routes";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { logout } from "../../pages/Login/authSlice";
+import type { User } from "../../services/api.types";  
 
 const MAIN_NAV = "flex justify-between items-center px-[20px] py-[5px]";
 const MAIN_NAV_LINK = "font-bold text-[#2c3e50]"
@@ -21,32 +22,37 @@ const MAIN_NAV_LOGO_IMAGE = "w-[200px]"
  * log the user out and redirect them to the home page.
  */
 const Header: React.FC = (): JSX.Element => {
+  const [user, setUser] = useState<User | null>(null);
   const {pathname} = useLocation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const userFromStorage = localStorage.getItem('user');
   const userFromState = useAppSelector((state) => state.auth.user);
 
-  const user = userFromStorage ? JSON.parse(userFromStorage) : userFromState;
+  useEffect(() => {
+    if (userFromState) {
+      setUser(userFromState);
+    }
+  }, [user, userFromState]);
+
 
   /**
    * Logs the user out by dispatching the logout action and redirects them to
    * the home page.
    */
-  const handleClick = () => {
+  const handleSignOut = () => {
     dispatch(logout());
-    navigate(routes.Home, { replace: true });
+    navigate('/', { replace: true ,  state: { from: window.location.pathname } });
   }
 
   return (
     <header className={MAIN_NAV}>
       {pathname === routes.Profile ? (
-        <Link to="/profile" className={MAIN_NAV_LOGO}>
+        <Link to={routes.Profile} className={MAIN_NAV_LOGO}>
           <img src={logo} alt="Argent Bank Logo" className={MAIN_NAV_LOGO_IMAGE} />
           <h1 className="sr-only">Argent Bank</h1>
         </Link>
       ) : (
-        <Link to="/" className={MAIN_NAV_LOGO}>
+        <Link to={routes.Home} className={MAIN_NAV_LOGO}>
           <img src={logo} alt="Argent Bank Logo" className={MAIN_NAV_LOGO_IMAGE} />
           <h1 className="sr-only">Argent Bank</h1>
         </Link>
@@ -56,7 +62,7 @@ const Header: React.FC = (): JSX.Element => {
           <ul className="flex">
             {(pathname === routes.Home || pathname === routes.Login) && (
             <li className="list-none">
-              <NavLink to="/login" className={`${MAIN_NAV_LINK_ACTIVE}`}>
+              <NavLink to={routes.Login} className={`${MAIN_NAV_LINK_ACTIVE}`}>
                 <i className="fa fa-user-circle inline-block mr-[5px]"></i>
                 Sign In
               </NavLink>
@@ -65,13 +71,13 @@ const Header: React.FC = (): JSX.Element => {
             {pathname === routes.Profile && (
             <>
             <li className="list-none mr-[8px]">
-              <NavLink to="/profile"  className={`${MAIN_NAV_LINK_ACTIVE}`}>
+              <NavLink to={routes.Profile}  className={`${MAIN_NAV_LINK_ACTIVE}`}>
                 <i className="fa fa-user-circle inline-block mr-[5px]"></i>
                 {user?.firstName}
               </NavLink>
             </li>
             <li>
-              <NavLink to="/"  className={`${MAIN_NAV_LINK} ${MAIN_NAV_LINK_ACTIVE}`} onClick={handleClick}>
+              <NavLink to={routes.Home}  className={`${MAIN_NAV_LINK} ${MAIN_NAV_LINK_ACTIVE}`} onClick={handleSignOut}>
                 <i className="fa fa-sign-out inline-block mr-[5px]"></i>
                 Sign Out
               </NavLink>

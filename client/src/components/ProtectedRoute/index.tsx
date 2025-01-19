@@ -1,24 +1,46 @@
-import { Navigate, useLocation, Outlet } from 'react-router-dom';
+import { Navigate, useLocation, Outlet, useNavigate } from 'react-router-dom';
+import { useAppSelector } from '../../app/hooks';
+import { useEffect } from 'react';
+import { useAppDispatch } from '../../app/hooks';
+import { useRef } from 'react';
 
-/**
- * A component that protects certain routes by checking for authentication.
- *
- * It retrieves the authentication token from localStorage and uses it to
- * determine whether the user is authenticated. If the token is not present,
- * the user is redirected to the login page, and the current path is passed
- * in the state for potential redirection after successful login.
- *
- * @returns {JSX.Element} The child components if authenticated, or a 
- * Navigate component to redirect to the login page otherwise.
- */
+
 const ProtectedRoute: React.FC = () => {
-  const token = localStorage.getItem('token');
+  const { token } = useAppSelector(state => state.auth);
+  const dispatch = useAppDispatch();
   const {pathname} = useLocation();
-  console.log('pathname', pathname);
+  const navigate = useNavigate();
+  const historyLengthRef = useRef(window.history.length);
+
+  useEffect(() => {
+    /**
+     * Handles the popstate event and prevents the browser from navigating away
+     * from the current route when the user presses the back button. Instead, it
+     * updates the history to the current route.
+     * @param {PopStateEvent} e - The popstate event object.
+     */
+    const handlePopstate = (e: PopStateEvent) => {
+      e.preventDefault();
+      if (window.history.length < historyLengthRef.current) {
+        window.history.pushState(null, document.title, window.location.href);
+        historyLengthRef.current = window.history.length;
+      } else {
+        historyLengthRef.current = window.history.length;
+      }
+    };
+
+    window.history.pushState(null, document.title, window.location.href);
+    historyLengthRef.current = window.history.length;
+
+    window.addEventListener('popstate', handlePopstate);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopstate);
+    };
+  }, [ token, dispatch, pathname, navigate]);
 
   if (!token) {
-    console.log('token', token);
-    return <Navigate to="/login" state={{ from: pathname }} replace />;
+    return <Navigate to="/" state={{ from: pathname }} replace />;
   }
 
   return <Outlet/>;

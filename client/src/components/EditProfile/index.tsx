@@ -56,7 +56,7 @@ const EditProfile: React.FC<EditProfileProps> = ({setEditMode}): JSX.Element => 
         updatedAt: Date.now().toString(),
       }
 
-      dispatch(updateProfile(updateUserProfile));  
+      dispatch(updateProfile(updateUserProfile));
     }
 
     setEditMode(false);

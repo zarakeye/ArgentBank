@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import { fetchProfile } from '../Login/authSlice';
 import EditProfile from '../../components/EditProfile';
-import routes from '../../routes';
 
 const MAIN =  "flex flex-col flex-1 pb-[2rem]";
 const BG_DARK = "bg-[#12002b]"
@@ -31,8 +30,8 @@ const Profile: React.FC = (): JSX.Element => {
   const [editMode, setEditMode] = useState(false);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const tokenFromStorage = localStorage.getItem('token');
-  const userFromStorage = localStorage.getItem('user');
+  const { token, user } = useAppSelector(state => state.auth);
+
 
   useEffect(() => {
     /**
@@ -45,23 +44,20 @@ const Profile: React.FC = (): JSX.Element => {
      * @returns {Promise<void>} A promise that resolves when the profile
      * data is fetched or the user is redirected.
      */
-    const fetchProfileData = async () => {
+    const fetchProfileData = async (): Promise<void> => {
       try {
-        if (tokenFromStorage) {
+        if (token) {
           await dispatch(fetchProfile()).unwrap();
         } else {
-          navigate(routes.Home, { replace: true });
+          navigate('/login', { replace: true });
         }
       } catch (error) {
         console.error("Error fetching profile:", error);
       }
     };
-    if (userFromStorage === null) {
-      fetchProfileData();
-    }
-  }, [dispatch, navigate, tokenFromStorage, userFromStorage]);
 
-  const { user } = useAppSelector(state => state.auth);
+    fetchProfileData();
+  }, [dispatch, navigate, token]);
 
   return (
     <main className={`${MAIN} ${BG_DARK}`}>
@@ -89,7 +85,7 @@ const Profile: React.FC = (): JSX.Element => {
           <p className={ACCOUNT_AMOUNT_DESCRIPTION}>Available Balance</p>
         </div>
         <div className={`${ACCOUNT_CONTENT_WRAPPER} cta`}>
-          <button className={`${TRANSACTION_BUTTON} ${CTA}`}>View transactions</button>
+          <button type='button' className={`${TRANSACTION_BUTTON} ${CTA}`}>View transactions</button>
         </div>
       </section>
       <section className={ACCOUNT}>
@@ -99,7 +95,7 @@ const Profile: React.FC = (): JSX.Element => {
           <p className={ACCOUNT_AMOUNT_DESCRIPTION}>Available Balance</p>
         </div>
         <div className={`${ACCOUNT_CONTENT_WRAPPER} cta`}>
-          <button className={`${TRANSACTION_BUTTON} ${CTA}`}>View transactions</button>
+          <button type='button' className={`${TRANSACTION_BUTTON} ${CTA}`}>View transactions</button>
         </div>
       </section>
       <section className={ACCOUNT}>
@@ -109,7 +105,7 @@ const Profile: React.FC = (): JSX.Element => {
           <p className={ACCOUNT_AMOUNT_DESCRIPTION}>Current Balance</p>
         </div>
         <div className={`${ACCOUNT_CONTENT_WRAPPER} cta`}>
-          <button className={`${TRANSACTION_BUTTON} ${CTA}`}>View transactions</button>
+          <button type="button" className={`${TRANSACTION_BUTTON} ${CTA}`}>View transactions</button>
         </div>
       </section>
     </main>
