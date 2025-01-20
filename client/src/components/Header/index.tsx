@@ -46,13 +46,13 @@ const Header: React.FC = (): JSX.Element => {
 
   return (
     <header className={MAIN_NAV}>
-      {pathname === routes.Profile ? (
-        <Link to={routes.Profile} className={MAIN_NAV_LOGO}>
+      {pathname === '/profile' ? (
+        <Link to='/profile' className={MAIN_NAV_LOGO}>
           <img src={logo} alt="Argent Bank Logo" className={MAIN_NAV_LOGO_IMAGE} />
           <h1 className="sr-only">Argent Bank</h1>
         </Link>
       ) : (
-        <Link to={routes.Home} className={MAIN_NAV_LOGO}>
+        <Link to='/' className={MAIN_NAV_LOGO}>
           <img src={logo} alt="Argent Bank Logo" className={MAIN_NAV_LOGO_IMAGE} />
           <h1 className="sr-only">Argent Bank</h1>
         </Link>
@@ -60,24 +60,24 @@ const Header: React.FC = (): JSX.Element => {
       <div>
         <nav>
           <ul className="flex">
-            {(pathname === routes.Home || pathname === routes.Login) && (
+            {(pathname === '/' || pathname === '/login') && (
             <li className="list-none">
-              <NavLink to={routes.Login} className={`${MAIN_NAV_LINK_ACTIVE}`}>
+              <NavLink to='/login' className={`${MAIN_NAV_LINK_ACTIVE}`}>
                 <i className="fa fa-user-circle inline-block mr-[5px]"></i>
                 Sign In
               </NavLink>
             </li>
             )}
-            {pathname === routes.Profile && (
+            {pathname === '/profile' && (
             <>
             <li className="list-none mr-[8px]">
-              <NavLink to={routes.Profile}  className={`${MAIN_NAV_LINK_ACTIVE}`}>
+              <NavLink to='/login'  className={`${MAIN_NAV_LINK_ACTIVE}`}>
                 <i className="fa fa-user-circle inline-block mr-[5px]"></i>
                 {user?.firstName}
               </NavLink>
             </li>
             <li>
-              <NavLink to={routes.Home}  className={`${MAIN_NAV_LINK} ${MAIN_NAV_LINK_ACTIVE}`} onClick={handleSignOut}>
+              <NavLink to='/'  className={`${MAIN_NAV_LINK} ${MAIN_NAV_LINK_ACTIVE}`} onClick={handleSignOut}>
                 <i className="fa fa-sign-out inline-block mr-[5px]"></i>
                 Sign Out
               </NavLink>
