@@ -14,7 +14,7 @@ const PublicRoute: React.FC = () => {
   const { token, user } = useAppSelector(state => state.auth);
 
   if (token && user) {
-    return <Navigate to='/login' replace />;
+    return <Navigate to='/profile' replace />;
   }
 
   return <Outlet/>
