@@ -8,7 +8,6 @@ import Footer from '../components/Footer';
 import './App.css'
 import PublicRoute from '../components/PublicRoute';
 import ProtectedRoute from '../components/ProtectedRoute';
-import routes from '../routes';
 
 /**
  * The main application component.
@@ -26,11 +25,11 @@ const App: React.FC = (): JSX.Element => {
     <Header />
     <Routes>
     <Route element={<PublicRoute />}>
-      <Route path={routes.Home} element={<Home />} />
-      <Route path={routes.Login} element={<Login />} />
+      <Route path='/' element={<Home />} />
+      <Route path='/login' element={<Login />} />
     </Route>
     <Route element={<ProtectedRoute />}>
-      <Route path={routes.Profile} element={<Profile />} />
+      <Route path='/profile' element={<Profile />} />
     </Route>
     </Routes>
     <Footer />
