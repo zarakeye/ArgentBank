@@ -30,34 +30,19 @@ const Profile: React.FC = (): JSX.Element => {
   const [editMode, setEditMode] = useState(false);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { token, user } = useAppSelector(state => state.auth);
-
+  const { user } = useAppSelector(state => state.auth);
 
   useEffect(() => {
-    /**
-     * Fetches the user profile data from the server, if the user is
-     * authenticated. If not, it redirects to the home page.
-     *
-     * The function is called on mount and whenever the user's storage
-     * token changes.
-     *
-     * @returns {Promise<void>} A promise that resolves when the profile
-     * data is fetched or the user is redirected.
-     */
-    const fetchProfileData = async (): Promise<void> => {
-      try {
-        if (token) {
-          await dispatch(fetchProfile()).unwrap();
-        } else {
-          navigate('/login', { replace: true });
-        }
-      } catch (error) {
-        console.error("Error fetching profile:", error);
-      }
-    };
+    if (!user) {
+      dispatch(fetchProfile());
+    }
+  }, [dispatch]);
 
-    fetchProfileData();
-  }, [dispatch, navigate, token]);
+  useEffect(() => {
+    if (!user) {
+      navigate('/login', { replace: true });
+    }
+  }, [navigate, user]);
 
   return (
     <main className={`${MAIN} ${BG_DARK}`}>

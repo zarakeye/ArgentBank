@@ -1,18 +1,18 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../../app/store';
-import type { AuthState, Credentials, User, ApiError } from '../../services/api.types';
+import type { ApiError, AuthState, Credentials, User } from '../../services/api.types';
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api/v1';
 
 const initialState: AuthState = {
-  token: null,
   user: null,
   error: null,
-  loading: false
+  loading: false,
+  loadingProfile: false
 };
 
 export const login = createAsyncThunk<
-  string,
+  User,
   Credentials,
   {
     state: RootState;
@@ -22,6 +22,7 @@ export const login = createAsyncThunk<
 (
   'auth/login',
   async (credentials: Credentials, { rejectWithValue }) => {
+    const { email, password } = credentials;
     try {
       const response = await fetch(
         `${BASE_URL}/user/login`, {
@@ -29,7 +30,8 @@ export const login = createAsyncThunk<
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(credentials),
+          credentials: 'include',
+          body: JSON.stringify({ email, password }),
         }
       );
 
@@ -42,10 +44,11 @@ export const login = createAsyncThunk<
       }
 
       const {body} = await response.json();
-      return body.token;
+      return body;
     } catch (error) {
       return rejectWithValue({
-        message: error instanceof Error ? error.message : 'An unknown error occured'
+        message: error instanceof Error ? error.message : 'An unknown error occured',
+        status: 500
       });
     }
   }
@@ -56,33 +59,30 @@ export const fetchProfile = createAsyncThunk<
   void,
     {
       state: RootState;
-      rejectValue: ApiError;
+      rejectValue: ApiError | null;
     }
 >(
   'auth/fetchProfile',
-  async (_, { getState, rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
-      const {auth} = getState() as RootState;
-      const token = auth.token;
-
-      if (!token) {
-        return rejectWithValue({
-          message: 'No authentication token found',
-          status: 401
-        });
-      }
-      const response = await fetch(
-        `${BASE_URL}/user/profile`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${auth.token}`,
-          },
-        }
-      );
+      const response = await fetch(`${BASE_URL}/user/profile`, {
+        method: 'GET',
+        credentials: 'include',
+      });
 
       if (!response.ok) {
-        const errorData = await response.json();
+        let errorData;
+
+        try {
+          errorData = await response.json();
+        } catch {
+          errorData = { message: 'Failed to fetch profile' };
+        }
+
+        // Si non authentifié, on retourne null pour éviter une erreur visible
+        if (response.status === 401) {
+          return rejectWithValue({ message: 'Unauthorized', status: 401 });
+        }
         
         return rejectWithValue({
           message: errorData.message || 'Failed to fetch profile',
@@ -90,12 +90,12 @@ export const fetchProfile = createAsyncThunk<
         });
       }
 
-      const {body} = await response.json();
+      const data = await response.json();
 
-      return body;
+      return data.body as User;
     } catch (error) {
       return rejectWithValue({
-        message: error instanceof Error ? error.message : 'Failed to fetch profile'
+        message: error instanceof Error ? error.message : 'unknown error',
       });
     }
   }
@@ -110,15 +110,14 @@ export const updateProfile = createAsyncThunk<
   }
 >(
   'auth/updateProfile',
-  async (user: User, { getState, rejectWithValue }) => {
+  async (user: User, {/*getState,*/ rejectWithValue }) => {
     try {
-      const {auth} = getState() as RootState;
       const response = await fetch(
         `${BASE_URL}/user/profile`, {
           method: 'PUT',
+          credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${auth.token}`,
           },
           body: JSON.stringify(user),
         }
@@ -142,25 +141,44 @@ export const updateProfile = createAsyncThunk<
   }
 );
 
+export const logoutUser = createAsyncThunk<
+  void,
+  void,
+  {
+    state: RootState;
+    rejectValue: ApiError;
+  }
+>(
+  'auth/logoutUser',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`${BASE_URL}/user/logout`, {
+        method: 'POST',
+        credentials: 'include', // ✅ indispensable pour que le cookie soit supprimé côté serveur
+      });
+
+      if (!response.ok) {
+        const errorData: ApiError = await response.json();
+        return rejectWithValue({
+          message: errorData.message || 'Logout failed',
+          status: response.status,
+        });
+      }
+
+      return;
+    } catch (error) {
+      return rejectWithValue({
+        message: error instanceof Error ? error.message : 'Unknown logout error',
+        status: 500,
+      });
+    }
+  }
+);
+
 export const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    /**
-     * Updates the authentication token in the state.
-     *
-     * This reducer function updates the `token` field in the Redux state
-     * with the new token value provided in the action's payload.
-     *
-     * @param {AuthState} state - The current state of the authentication slice.
-     * @param {PayloadAction<string>} action - The action object containing
-     * the new authentication token as a string.
-     */
-    setToken: (state: AuthState, action: PayloadAction<string>) => {
-      state.token = action.payload;
-    },
-
-    
     /**
      * Initializes the authentication state with provided payload data.
      *
@@ -183,7 +201,6 @@ export const authSlice = createSlice({
     logout: (state: AuthState): AuthState => {
       return {
         ...state,
-        token: null,
         user: null,
         error: null,
         loading: false,
@@ -228,28 +245,34 @@ export const authSlice = createSlice({
       })
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
-        state.token = action.payload;
+        state.user = action.payload;
+        state.error = null;
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message ?? 'An error occurred while logging in';
       })
+      .addCase(fetchProfile.pending, (state) => {
+        state.loadingProfile = true;
+        state.error = null;
+      })
       .addCase(fetchProfile.fulfilled, (state, action) => {
-        state.loading = false;
         state.user = action.payload;
+        state.loadingProfile = false;
       })
       .addCase(fetchProfile.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload?.message ?? 'Failed to fetch profile';
-
+        state.loadingProfile = false;
         if (action.payload?.status === 401) {
-          state.token = null;
           state.user = null;
+          // state.error = action.payload.message;
+          return;
         }
-      })
-      .addCase(fetchProfile.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+        
+        if (action.payload) {
+          state.error = action.payload.message
+        } else {
+          state.error = null;
+        }
       })
       .addCase(updateProfile.fulfilled, (state, action) => {
         state.loading = false;
@@ -262,10 +285,18 @@ export const authSlice = createSlice({
       .addCase(updateProfile.pending, (state) => {
         state.loading = true;
         state.error = null;
-      });
+      })
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.user = null;
+        state.error = null;
+        state.loading = false;
+    })
+    .addCase(logoutUser.rejected, (state, action) => {
+      state.error = action.payload?.message || 'Logout failed';
+    })
   },
 });
 
-export const { setToken, initAuth, logout } = authSlice.actions;
+export const { initAuth, logout } = authSlice.actions;
 export default authSlice.reducer;
 

@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
-import logo from "../../assets/argentBankLogo.svg";
-import routes from "../../routes";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { logout } from "../../pages/Login/authSlice";
-import type { User } from "../../services/api.types";  
+import logo from "../../assets/argentBankLogo.svg";
+import { logoutUser } from "../../pages/Login/authSlice";
+import type { User } from "../../services/api.types";
 
 const MAIN_NAV = "flex justify-between items-center px-[20px] py-[5px]";
 const MAIN_NAV_LINK = "font-bold text-[#2c3e50]"
@@ -40,7 +39,7 @@ const Header: React.FC = (): JSX.Element => {
    * the home page.
    */
   const handleSignOut = () => {
-    dispatch(logout());
+    dispatch(logoutUser());
     navigate('/', { replace: true ,  state: { from: window.location.pathname } });
   }
 

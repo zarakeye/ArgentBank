@@ -1,13 +1,13 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
+import Footer from '../components/Footer';
 import Header from '../components/Header';
+import ProtectedRoute from '../components/ProtectedRoute';
+import PublicRoute from '../components/PublicRoute';
 import Home from '../pages/Home';
 import Login from '../pages/Login';
 import Profile from '../pages/Profile';
-import Footer from '../components/Footer';
-import './App.css'
-import PublicRoute from '../components/PublicRoute';
-import ProtectedRoute from '../components/ProtectedRoute';
+import './App.css';
 
 /**
  * The main application component.
@@ -24,13 +24,14 @@ const App: React.FC = (): JSX.Element => {
   <>
     <Header />
     <Routes>
-    <Route element={<PublicRoute />}>
-      <Route path='/' element={<Home />} />
-      <Route path='/login' element={<Login />} />
-    </Route>
-    <Route element={<ProtectedRoute />}>
-      <Route path='/profile' element={<Profile />} />
-    </Route>
+      <Route element={<PublicRoute />}>
+        <Route path='/' element={
+          <Home />} />
+        <Route path='/login' element={<Login />} />
+      </Route>
+      <Route element={<ProtectedRoute />}>
+        <Route path='/profile' element={<Profile />} />
+      </Route>
     </Routes>
     <Footer />
   </>        

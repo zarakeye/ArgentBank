@@ -17,10 +17,10 @@ export interface AuthResponse {
 }
 
 export interface AuthState {
-  token: string | null;
   user: User | null;
   error: string | null;
   loading: boolean;
+  loadingProfile: boolean;
 }
 
 export interface ApiError {

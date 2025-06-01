@@ -1,48 +1,36 @@
-import { Navigate, useLocation, Outlet, useNavigate } from 'react-router-dom';
-import { useAppSelector } from '../../app/hooks';
-import { useEffect } from 'react';
-import { useAppDispatch } from '../../app/hooks';
-import { useRef } from 'react';
+import React, { useEffect } from 'react';
+import { Navigate, Outlet } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { fetchProfile } from '../../pages/Login/authSlice';
 
-
+/**
+ * A protected route component that will only render its children if the user is authenticated.
+ *
+ * The component will redirect to the login page if the user is not authenticated.
+ *
+ * @returns {JSX.Element} The protected route component.
+ */
 const ProtectedRoute: React.FC = () => {
-  const { token } = useAppSelector(state => state.auth);
   const dispatch = useAppDispatch();
-  const {pathname} = useLocation();
-  const navigate = useNavigate();
-  const historyLengthRef = useRef(window.history.length);
+  const { user, loadingProfile } = useAppSelector(state => state.auth);
 
   useEffect(() => {
-    /**
-     * Handles the popstate event and prevents the browser from navigating away
-     * from the current route when the user presses the back button. Instead, it
-     * updates the history to the current route.
-     * @param {PopStateEvent} e - The popstate event object.
-     */
-    const handlePopstate = (e: PopStateEvent) => {
-      e.preventDefault();
-      if (window.history.length < historyLengthRef.current) {
-        window.history.pushState(null, document.title, window.location.href);
-        historyLengthRef.current = window.history.length;
-      } else {
-        historyLengthRef.current = window.history.length;
-      }
-    };
+    if (!user) {
+      dispatch(fetchProfile());
+    }
+  }, [dispatch, user]);
 
-    window.history.pushState(null, document.title, window.location.href);
-    historyLengthRef.current = window.history.length;
-
-    window.addEventListener('popstate', handlePopstate);
-
-    return () => {
-      window.removeEventListener('popstate', handlePopstate);
-    };
-  }, [ token, dispatch, pathname, navigate]);
-
-  if (!token) {
-    return <Navigate to="/" state={{ from: pathname }} replace />;
+  if (loadingProfile) {
+    console.log('PublicRoute state when loadingProfile=true: ', {user, loadingProfile});
+    return <div>Loading...</div>;
   }
 
+  if (!user) {
+    console.log('PublicRoute state when user=false: ', {user, loadingProfile});
+    return <Navigate to="/"/* state={{ from: location }} replace*/ />;
+  }
+
+  console.log('PublicRoute state: ', {user, loadingProfile});
   return <Outlet/>;
 }
 

@@ -1,7 +1,7 @@
 import React, { useState, FormEvent, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "../../app/hooks";
-import { setToken, login } from "./authSlice";
+import { login, fetchProfile } from "./authSlice";
 import type { Credentials } from "../../services/api.types";
 
 const MAIN = "flex flex-col flex-1 justify-start"
@@ -27,13 +27,16 @@ const INPUT_REMEMBER = "flex"
 const Login: React.FC = (): JSX.Element => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { loading, error, token } = useAppSelector(state => state.auth);
-  const localStorageUsername = localStorage.getItem('username');
+  const { loading, error, user } = useAppSelector(state => state.auth);
+  // const localStorageUsername = localStorage.getItem('username');
 
-  const  [formData, setFormData] = useState({
-    username: "",
-    password: "",
-    rememberMe: false,
+  const  [formData, setFormData] = useState(() => {
+    const savedUsername = localStorage.getItem('username');
+    return {
+      username: savedUsername || '',
+      password: '',
+      rememberMe: !!savedUsername,
+    };
   });
 
   const credentials: Credentials = {
@@ -41,15 +44,21 @@ const Login: React.FC = (): JSX.Element => {
     password: formData.password,
   };
 
+  // useEffect(() => {
+  //   if (localStorageUsername) {
+  //     setFormData({
+  //       ...formData,
+  //       username: localStorageUsername,
+  //       rememberMe: true
+  //     });
+  //   }
+  // }, []);
+
   useEffect(() => {
-    if (localStorageUsername) {
-      setFormData({
-        ...formData,
-        username: localStorageUsername,
-        rememberMe: true
-      });
+    if (user) {
+      navigate('/profile', { replace: true });
     }
-  }, []);
+  }, [user, navigate]);
 
   /**
    * Handles the form submission for the login form.
@@ -74,18 +83,26 @@ const Login: React.FC = (): JSX.Element => {
       } else {
         localStorage.removeItem('username');
       }
-      const loginResult = await dispatch(login(credentials)).unwrap();
-      dispatch(setToken(loginResult));
-    } catch (error) {
-      console.error("An error occurred while logging in: ", error);
+
+      const resultAction = await dispatch(login(credentials));
+
+      if (login.rejected.match(resultAction)) {
+        console.error("Login error:", resultAction.payload);
+        return;
+      }
+
+      const profileAction = await dispatch(fetchProfile());
+      if (fetchProfile.fulfilled.match(profileAction)) {
+        navigate('/profile');
+      } else {
+        console.error("Failed to fetch profile:", profileAction.payload);
+      }
+    } catch (err) {
+      console.error("Unexpected error:", err);
     }
   };
-
-  useEffect(() => {
-    if (token) {
-      navigate('/profile', { replace: true });
-    }
-  }, [token, navigate]);
+  
+  // const { user } = useAppSelector(state => state.auth);
 
   return (
     <main className={`${MAIN} ${BG_DARK}`}>
