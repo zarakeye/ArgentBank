@@ -28,7 +28,6 @@ const Login: React.FC = (): JSX.Element => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { loading, error, user } = useAppSelector(state => state.auth);
-  // const localStorageUsername = localStorage.getItem('username');
 
   const  [formData, setFormData] = useState(() => {
     const savedUsername = localStorage.getItem('username');
@@ -43,16 +42,6 @@ const Login: React.FC = (): JSX.Element => {
     email: formData.username,
     password: formData.password,
   };
-
-  // useEffect(() => {
-  //   if (localStorageUsername) {
-  //     setFormData({
-  //       ...formData,
-  //       username: localStorageUsername,
-  //       rememberMe: true
-  //     });
-  //   }
-  // }, []);
 
   useEffect(() => {
     if (user) {
@@ -102,8 +91,6 @@ const Login: React.FC = (): JSX.Element => {
     }
   };
   
-  // const { user } = useAppSelector(state => state.auth);
-
   return (
     <main className={`${MAIN} ${BG_DARK}`}>
       <section className={SIGN_IN_CONTENT}>

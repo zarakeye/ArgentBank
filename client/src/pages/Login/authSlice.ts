@@ -2,7 +2,8 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../../app/store';
 import type { ApiError, AuthState, Credentials, User } from '../../services/api.types';
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api/v1';
+const NODE_ENV = import.meta.env.NODE_ENV;
+const BASE_URL = NODE_ENV === 'production' ? import.meta.env.VITE_API_URL_PROD : import.meta.env.VITE_API_URL_DEV // || 'http://localhost:3001/api/v1';
 
 const initialState: AuthState = {
   user: null,
