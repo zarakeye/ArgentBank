@@ -3,7 +3,8 @@ import { RootState } from '../../app/store';
 import type { ApiError, AuthState, Credentials, User } from '../../services/api.types';
 
 console.log('import.meta.env:', import.meta.env);
-const BASE_URL = import.meta.env.NODE_ENV === 'production' ? import.meta.env.VITE_API_URL_PROD : import.meta.env.VITE_API_URL_DEV
+// const BASE_URL = import.meta.env.NODE_ENV === 'production' ? import.meta.env.VITE_API_URL_PROD : import.meta.env.VITE_API_URL_DEV
+const BASE_URL = import.meta.env.VITE_API_URL
 console.log('VITE_API_URL_PROD:', import.meta.env.VITE_API_URL_PROD);
 console.log('BASE_URL:', BASE_URL);
 
