@@ -1,4 +1,10 @@
 {
+  "compilerOptions": {
+    "types": ["vite/client", "react", "react-dom"], 
+    "baseUrl": ".", 
+    "paths": {},
+    "skipLibCheck": true
+  },
   "files": [],
   "references": [
     { "path": "./tsconfig.app.json" },
