@@ -1,3 +1,21 @@
 {
-	"siteId": "abb59f8c-ab71-4ca3-9437-df9c68f1a5af"
+	"siteId": "abb59f8c-ab71-4ca3-9437-df9c68f1a5af",
+	"geolocation": {
+		"data": {
+			"city": "La Motte-Servolex",
+			"country": {
+				"code": "FR",
+				"name": "France"
+			},
+			"subdivision": {
+				"code": "ARA",
+				"name": "Auvergne-Rhône-Alpes"
+			},
+			"timezone": "Europe/Paris",
+			"latitude": 45.5936,
+			"longitude": 5.8681,
+			"postalCode": "73290"
+		},
+		"timestamp": 1749056702102
+	}
 }

@@ -7,6 +7,7 @@ import PublicRoute from '../components/PublicRoute';
 import Home from '../pages/Home';
 import Login from '../pages/Login';
 import Profile from '../pages/Profile';
+import Swagger from '../pages/Documentation';
 import './App.css';
 
 /**
@@ -32,6 +33,7 @@ const App: React.FC = (): JSX.Element => {
       <Route element={<ProtectedRoute />}>
         <Route path='/profile' element={<Profile />} />
       </Route>
+      <Route path='/swagger' element={<Swagger />} />
     </Routes>
     <Footer />
   </>        
