@@ -4,19 +4,21 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+    "dev": "NODE_ENV=development vite",
+    "build": "NODE_ENV=production tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "NODE_ENV=production vite preview"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.5.0",
     "axios": "^1.7.9",
     "cors": "^2.8.5",
+    "path": "^0.12.7",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-redux": "^9.2.0",
-    "swagger": "^0.7.5"
+    "swagger": "^0.7.5",
+    "url": "^0.11.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
