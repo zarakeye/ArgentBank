@@ -2,7 +2,10 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../../app/store';
 import type { ApiError, AuthState, Credentials, User } from '../../services/api.types';
 
+console.log('import.meta.env:', import.meta.env);
 const BASE_URL = import.meta.env.NODE_ENV === 'production' ? import.meta.env.VITE_API_URL_PROD : import.meta.env.VITE_API_URL_DEV
+console.log('VITE_API_URL_PROD:', import.meta.env.VITE_API_URL_PROD);
+console.log('BASE_URL:', BASE_URL);
 
 const initialState: AuthState = {
   user: null,
@@ -25,7 +28,7 @@ export const login = createAsyncThunk<
     const { email, password } = credentials;
     try {
       const response = await fetch(
-        `${BASE_URL}/api/v1/user/login`, {
+        `${BASE_URL}/user/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
