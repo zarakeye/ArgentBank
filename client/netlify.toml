@@ -9,6 +9,6 @@
 
 [[redirects]]
   from = "/api/*"
-  to = "https://argentbank-backend-6ok3.onrender.com/api/:splat"
+  to = "https://mere-edy-zarakeye-cd0b9710.koyeb.app/api/:splat"
   status = 200
   force = true
